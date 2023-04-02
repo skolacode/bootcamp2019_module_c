@@ -1,5 +1,7 @@
 <?php
 
+  session_start();
+
   // Hold the value of input
   $username = '';
   $password = '';
@@ -35,8 +37,17 @@
      * 3. one for password, if not match
      */
 
+    
+    // TODO > will replace this code. We will check with DB for the login credentials
+    if ($username && $password) {
+      $_SESSION['username'] = $username;
+      header('Location: index.php');
+      exit;
+    }
+
   }
 ?>
+
 
 <!DOCTYPE html>
 <html>

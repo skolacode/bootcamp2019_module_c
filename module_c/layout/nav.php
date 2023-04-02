@@ -1,16 +1,23 @@
+<?php include('function/loginSession.php') ?>
+
 <div>
   <h1 id="title">Employee Listing</h1>
   <nav>
     <ul class="left-nav">
       <li><a href="/index.php">Index</a></li>
       <li><a href="/list.php">List</a></li>
-      <li><a href="/insert.php">Insert</a></li>
+
+      <?php if($isLogin): ?>
+          <li><a href="/insert.php">Insert</a></li>
+      <?php endif; ?>
       <li><a href="/logout.php">Logout</a></li>
     </ul>
 
-    <ul class="right-nav">
-      <span>Username: xxx</span>
-    </ul>
+    <?php if($isLogin): ?>
+      <ul class="right-nav">
+        <span>Username: xxx</span>
+      </ul>
+    <?php endif; ?>
   </nav>
 </div>
 <style>
