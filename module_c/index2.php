@@ -85,7 +85,7 @@ if (mysqli_num_rows($result) > 0) {
         <?php foreach ($items as $item) : ?>
           <tr>
               <td><?= $item['id'] ?></td>
-              <td><?= $item['name'] ?></td>
+              <td class="searchable-name"><?= $item['name'] ?></td>
               <td><?= $item['gender'] ?></td>
               <td><?= $item['department_name'] ?></td>
               <td><?= $item['salary'] ?></td>
@@ -104,31 +104,18 @@ if (mysqli_num_rows($result) > 0) {
 
   <script>
     $(document).ready(function() {
-      // Handle search input
-      $('#search').keyup(function() {
-
-        // Get search term and convert to lowercase
-        var searchTerm = $(this).val().toLowerCase();
-
-        if(searchTerm !== '') {
-          // Loop through each row in the table
-          $('table tbody tr').each(function() {
-              // Get the text content of the row and convert to lowercase
-            var rowText = $(this).text().toLowerCase();
-            
-            // If the row text contains the search term, add a highlight class
-            if (rowText.indexOf(searchTerm) > -1) {
-              $(this).addClass('highlight');
-            } else {
-              $(this).removeClass('highlight');
-            }
-          });
-        }
-        else {
-          $('table tbody tr').each(function() {
-            $(this).removeClass('highlight');
-          })
-        }
+      $('#search').on('keyup', function() {
+        var query = $(this).val();
+        $('.searchable-name').each(function() {
+          var text = $(this).text();
+          var match = text.match(new RegExp(query, 'i'));
+          if (match) {
+            var highlighted = text.replace(new RegExp(match[0], 'gi'), '<span class="highlight">' + match[0] + '</span>');
+            $(this).html(highlighted);
+          } else {
+            $(this).html(text);
+          }
+        });
       });
     });
   </script>
