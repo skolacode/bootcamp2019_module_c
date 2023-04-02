@@ -2,6 +2,8 @@
 
   session_start();
 
+  include('function/dbConnection.php');
+
   // Hold the value of input
   $username = '';
   $password = '';
