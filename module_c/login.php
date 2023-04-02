@@ -43,6 +43,12 @@
 <head>
     <title>Login Form</title>
 
+    <style>
+      .error {
+        color: red
+      }
+    </style>
+
     <script src="lib/jquery-3.3.1.slim.min.js"></script>
 </head>
 <body>
@@ -56,19 +62,21 @@
         <input type="password" id="password" name="password">
         <span class="error">* <?php echo $passwordErr;?></span><br><br>
         <input type="submit" value="Login">
-        <input type="reset" value="Reset">
+        <button id="resetButton">Reset</button>
     </form>
 
     <script>
       // focus on the username input field when the page is loaded
       $(document).ready(function() {
-          $('#username').focus();
-      });
+        $('#username').focus();
 
-      // focus on the username input field after the reset button is clicked
-      $('input[type="reset"]').on('click', function() {
-            $('#username').focus();
+        $('#resetButton').on('click', function() {
+          $('#username').val('');
+          $('#password').val('');
+
+          $('#username').focus();
         });
+      });
     </script>
 </body>
 </html>
