@@ -1,3 +1,3 @@
 <?php  
-  echo "Hello, Php";
+  echo "Hello, i am login";
 ?>  
