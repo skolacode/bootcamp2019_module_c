@@ -1,8 +1,9 @@
-version: '3'
+version: '3.9'
 
 services:
   web:
-    image: php:7.0-apache
+    # image: php:7.0-apache
+    build: './module_c'
     ports:
       - "8081:80"
     volumes:
