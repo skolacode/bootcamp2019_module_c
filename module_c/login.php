@@ -2,8 +2,6 @@
 
   session_start();
 
-  include('function/dbConnection.php');
-
   // Hold the value of input
   $username = '';
   $password = '';
@@ -14,7 +12,7 @@
   // handle form submission if it has been submitted
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
-    $password = $_POST['password'];
+    $pass = $_POST['password'];
     
     // trim input
     // - Password value should not be trimmed, the space might be the password
@@ -28,7 +26,7 @@
       $usernameErr = 'Username is required';
     }
 
-    if (empty($password)) {
+    if (empty($pass)) {
       $passwordErr = 'Password is required';
     }
 
@@ -41,12 +39,26 @@
 
     
     // TODO > will replace this code. We will check with DB for the login credentials
-    if ($username && $password) {
-      $_SESSION['username'] = $username;
-      header('Location: index.php');
-      exit;
+    if ($username && $pass) {
+
+      include 'function/dbConnection.php';
+      
+      // Query the table
+      $sql = "SELECT username FROM admin where username = '".$username."' and password = '".$pass."'";
+
+      $result = mysqli_query($mysqli, $sql);
+
+      if (mysqli_num_rows($result) > 0) {
+        $_SESSION['username'] = $username;
+        header('Location: index.php');
+        exit;   
+      } else {
+        $usernameErr = 'Username not match';
+        $passwordErr = 'Password not match';
+      }
     }
 
+    $password = '';
   }
 ?>
 
@@ -69,17 +81,22 @@
     <?php include('layout/nav.php') ?>
 
     <h1>Login</h1>
-    <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" value="<?php echo $username; ?>">
-        <span class="error">* <?php echo $usernameErr;?></span><br><br>
-        <label for="password">Password:</label>
-        <!-- Password value should not be retain -->
-        <input type="password" id="password" name="password">
-        <span class="error">* <?php echo $passwordErr;?></span><br><br>
-        <input type="submit" value="Login">
-        <button id="resetButton">Reset</button>
+    <form method="POST" autocomplete="off" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+
+      <!-- TO prevent cache value -->
+      <input type="hidden" name="nonce" value="<?php echo uniqid(); ?>">
+
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" value="<?php echo $username; ?>">
+      <span class="error">* <?php echo $usernameErr;?></span><br><br>
+      <label for="password">Password:</label>
+      <!-- Password value should not be retain -->
+      <input type="password" id="password" name="password">
+      <span class="error">* <?php echo $passwordErr;?></span><br><br>
+      <input type="submit" value="Login">
+      <button id="resetButton">Reset</button>
     </form>
+
 
     <script>
       // focus on the username input field when the page is loaded
