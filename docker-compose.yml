@@ -1,6 +1,21 @@
 version: '3.9'
 
 services:
+  web-d:
+    # image: php:7.0-apache
+    build: './module_d_php'
+    ports:
+      - "8084:80"
+    volumes:
+      - ./module_d_php:/var/www/html
+    depends_on:
+      - db
+  web-d-react:
+    build: './module_d_react'
+    ports:
+      - "8085:80"
+    volumes:
+      - ./module_d_react:/var/www/html
   web:
     # image: php:7.0-apache
     build: './module_c'

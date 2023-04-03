@@ -1,69 +1,101 @@
 <?php
-// Define database connection
-include 'function/dbConnection.php';
+  include 'functions/loginSession.php';
+  include 'functions/dbConnection.php';
 
-// Define the number of records to display per page
-$records_per_page = 10;
+  $sql = "select employee.*, department.name as department_name from employee join department on department.id = employee.department_id order by employee.id";
 
-// Get the current page number
-if (isset($_GET['page']) && is_numeric($_GET['page'])) {
-    $current_page = $_GET['page'];
-} else {
-    $current_page = 1;
-}
+  $result = mysqli_query($mysqli, $sql);
 
-// Calculate the offset for the query
-$offset = ($current_page - 1) * $records_per_page;
-
-// Define the search query
-$search_query = "";
-if (isset($_GET['search'])) {
-    $search_query = " WHERE name LIKE '%" . $_GET['search'] . "%' OR email LIKE '%" . $_GET['search'] . "%'";
-}
-
-// Define the SQL query to retrieve the records
-$sql = "SELECT * FROM employee" . $search_query . " LIMIT " . $records_per_page . " OFFSET " . $offset;
-
-// Execute the SQL query
-$result = mysqli_query($mysqli, $sql);
-
-// Check if there are any records
-if (mysqli_num_rows($result) > 0) {
-    // Output the table header
-    echo "<table>";
-    echo "<thead><tr><th>Name</th><th>Email</th></tr></thead>";
-
-    // Output the table body
-    echo "<tbody>";
+  if (mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
-        echo "<tr><td>" . $row['name'] . "</td><td>" . $row['email'] . "</td></tr>";
+      $lists[] = $row;
     }
-    echo "</tbody>";
-
-    // Output the table footer
-    echo "</table>";
-
-    // Calculate the total number of records
-    $sql_count = "SELECT COUNT(*) AS count FROM employee" . $search_query;
-    $result_count = mysqli_query($mysqli, $sql_count);
-    $row_count = mysqli_fetch_assoc($result_count);
-    $total_records = $row_count['count'];
-
-    // Calculate the total number of pages
-    $total_pages = ceil($total_records / $records_per_page);
-
-    // Output the pagination links
-    echo "<div class='pagination'>";
-    for ($i = 1; $i <= $total_pages; $i++) {
-        if ($i == $current_page) {
-            echo "<a class='active'>" . $i . "</a>";
-        } else {
-            echo "<a href='?page=" . $i . "&search=" . $_GET['search'] . "'>" . $i . "</a>";
-        }
-    }
-    echo "</div>";
-} else {
-    echo "No records found.";
-}
-
+  } else {
+    // Nothing todo for now
+  }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+  <?php include 'layout/header.php' ?>
+
+  <style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+
+      .highlight {
+        background-color: yellow;
+      }
+  </style>
+  
+  <body>
+    <?php include 'layout/navigation.php' ?>
+
+    <br><br>
+    <input type="text" id="search" placeholder="Search employee name...">
+    <br>
+    <table>
+      <thead>
+        <tr>
+          <td>Id</td>
+          <td>Name</td>
+          <td>Gender</td>
+          <td>Department</td>
+          <td>Salary</td>
+        </tr>
+      </thead>
+
+      <tbody>
+        <?php foreach ($lists as $list) : ?>
+          <tr>
+            <td><?= $list['id'] ?></td>
+            <td class="searchable-name"><?= $list['name'] ?></td>
+            <td><?= $list['gender'] == 'M' ? "MALE" : "FEMALE" ?></td>
+            <td><?= $list['department_name'] ?></td>
+            <td><?= $list['salary'] ?></td>
+
+            <?php if($isLogin): ?>
+              <td>
+                <form method="POST" action="delete.php">
+                  <input type="hidden" name="userID" id="userID" value="<?= $list['id'] ?>" >
+                  <input type="submit" value="Delete">
+                </form>
+              </td>
+            <?php endif ?>
+          </tr>
+        <?php endforeach ?>
+      </tbody>
+    </table>
+  </body>
+
+  <script>
+    $(document).ready(function() {
+      $('#search').on('keyup', function() {
+        var query = $(this).val();
+        $('.searchable-name').each(function() {
+          var text = $(this).text();
+          var match = text.match(new RegExp(query, 'i'));
+          if (match) {
+            var highlighted = text.replace(new RegExp(match[0], 'gi'), '<span class="highlight">' + match[0] + '</span>');
+            $(this).html(highlighted);
+          } else {
+            $(this).html(text);
+          }
+        });
+      });
+    });
+  </script>
+</html>
